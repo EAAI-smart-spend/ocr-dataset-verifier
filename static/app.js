@@ -67,6 +67,8 @@ function sortItems() {
         const bConfidence = parseFloat(b.dataset.confidence);
         const aVerified = a.dataset.verified === 'true';
         const bVerified = b.dataset.verified === 'true';
+        const aText = a.querySelector('.item-input')?.value.trim() || '';
+        const bText = b.querySelector('.item-input')?.value.trim() || '';
 
         switch (sortType) {
             case 'confidence-asc':
@@ -83,6 +85,10 @@ function sortItems() {
                     return aConfidence - bConfidence;
                 }
                 return aVerified ? -1 : 1;
+            case 'text-asc':
+                return compareText(aText, bText);
+            case 'text-desc':
+                return compareText(bText, aText);
             default:
                 return aConfidence - bConfidence;
         }
@@ -90,6 +96,16 @@ function sortItems() {
 
     // 重新排列 DOM
     cards.forEach(card => container.appendChild(card));
+}
+
+function compareText(a, b) {
+    // 簡單的字符串比較，完全按照字面值排序
+    // 這樣 $0.0 和 $0.00 會被視為不同的字符串
+    // 001 和 1 也會被視為不同的字符串
+    return a.localeCompare(b, 'zh-TW', {
+        sensitivity: 'base',
+        caseFirst: 'lower'
+    });
 }
 
 function executeBatchAction() {
@@ -694,3 +710,4 @@ async function updateStats() {
         console.error('更新統計失敗:', error);
     }
 }
+
